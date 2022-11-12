@@ -1,9 +1,10 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import express from 'express'
+import 'reflect-metadata';
+import express from 'express';
 import { AppDataSource } from './data-source';
-import { Artist } from './entities/artists.entity';
+import { fetchArtists } from './controllers/artists.controller';
 
 async function main() {
 
@@ -17,11 +18,7 @@ async function main() {
 
         app.get('/', async (req, res) => {
 
-            const artistRepository = db.getRepository(Artist);
-
-            const artists = await artistRepository.find();
-
-            return res.status(200).json({ artists });
+            return await fetchArtists(req, res)
 
         });
 
