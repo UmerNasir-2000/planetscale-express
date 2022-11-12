@@ -4,8 +4,8 @@ dotenv.config();
 import 'reflect-metadata';
 import express from 'express';
 import { AppDataSource } from './data-source';
-import { fetchArtists } from './controllers/artists.controller';
-import artistsRouter from './routes/artists.route'
+import artistsRouter from './routes/artists.route';
+import { StatusCodes } from 'http-status-codes';
 
 async function main() {
 
@@ -15,11 +15,19 @@ async function main() {
 
         const PORT = process.env.PORT;
 
-        await AppDataSource.initialize();
+        const { isInitialized } = await AppDataSource.initialize();
 
-        app.get('/api/artists', artistsRouter);
+        if (isInitialized) console.log('Successfully connected to planetscale..')
 
-        app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
+        app.get('/healthcheck', (request, response) => response.status(StatusCodes.OK).json({ message: 'ping successfull!' }))
+
+        app.use('/api/artists', artistsRouter);
+
+        app.use('', (request, response) => { 
+            return response.status(StatusCodes.NOT_FOUND).json({ message: 'route does not exists.' });
+        })
+
+        app.listen(PORT, () => console.log(`Server running at https://yts-api.cyclic.app/:${PORT}`));
 
 	
     } catch (error) {
