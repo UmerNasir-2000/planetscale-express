@@ -5,6 +5,7 @@ import 'reflect-metadata';
 import express from 'express';
 import { AppDataSource } from './data-source';
 import { fetchArtists } from './controllers/artists.controller';
+import artistsRouter from './routes/artists.route'
 
 async function main() {
 
@@ -14,13 +15,9 @@ async function main() {
 
         const PORT = process.env.PORT;
 
-        const db = await AppDataSource.initialize();
+        await AppDataSource.initialize();
 
-        app.get('/', async (req, res) => {
-
-            return await fetchArtists(req, res)
-
-        });
+        app.get('/api/artists', artistsRouter);
 
         app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
 
